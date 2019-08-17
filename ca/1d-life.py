@@ -10,8 +10,16 @@ class RIGHT_EDGE(Exception):
     def __init__(self, message):
         self.message = message
 
+rewind = []
+keep_going = "no"
+def rewinder(index):
+    old_automata = rewind[index]
+    return old_automata
+    
+
 
 def get_new_value(old_gen, old_automata):
+    rewind.append(old_automata[:])
     prev_status = old_automata[:]
     on = 0
     for j in range(49*(old_gen+1), 49*(old_gen+1) + 49):
@@ -126,13 +134,25 @@ while not done:
     # --- Game logic should go here
     if running:
         if generations < SQ_NUM:
-            generations += 1
-            if generations == 49:
-                generations = 0
-                automata = start()
-                
+            if keep_going == "no":
+                generations += 1
+                if generations == 49:
+                    keep_going = 'yes'
+                    generations = 47
+                    automata = rewinder(generations)
+                    
+                else:
+                    automata = get_new_value(generations-1, automata)
             else:
-                automata = get_new_value(generations-1, automata)
+                if generations > 0:
+                    generations -= 1
+                    automata = rewinder(generations)
+                else:
+                    keep_going = "no"
+                    generations += 1
+                    rewind = []
+                    automata = get_new_value(generations-1, automata)
+
             
         # --- Screen-clearing code goes here
     
