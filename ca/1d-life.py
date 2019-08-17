@@ -1,9 +1,54 @@
 import pygame, random
 
+
+class LEFT_EDGE(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class RIGHT_EDGE(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 def get_new_value(old_gen, old_automata):
+    prev_status = old_automata[:]
+    on = 0
+    for j in range(49*(old_gen+1), 49*(old_gen+1) + 49):
+        for i in range(j - 50, j - 47):
+            try:
+                if j%49 == 0 and i == j - 50:
+                    raise LEFT_EDGE("hit left edge")
+
+                if (j+1)%49 == 0 and i == j - 48:
+                    raise RIGHT_EDGE("hit right edge")
+
+                if prev_status[i] == 1:
+                    on+=1
+                print(f'i {i} at j {j}')
+            
+            except LEFT_EDGE as l:
+                i +=1
+
+            except RIGHT_EDGE as r:
+                continue
+        
+        if on in [1,2]:
+            old_automata[j] = 1
+        else:
+            old_automata[j] = 0
+        
+        on = 0
+
+
+
+    return old_automata    
+
+    
     # TBC - add code to generate the next row of cells,
     # then replace the return statement below to
     # return the updated automata
+    print(prev_status)
     return old_automata
 
 # Define some colors and other constants
@@ -21,13 +66,18 @@ pygame.init()
 # Set the width and height of the screen [width, height]
 size = (WIN_SIZE, WIN_SIZE + BTN_SIZE+ 20)
 screen = pygame.display.set_mode(size)
-automata = [0] * (SQ_NUM*SQ_NUM)
 generations = 0
 time_step = 5
 running = True
 
 # Assign middle of first row to 1
-automata[SQ_NUM//2] = 1
+
+def start():
+    automata = [0] * (SQ_NUM*SQ_NUM)
+    automata[SQ_NUM//2] = 1
+    return automata
+
+automata = start()
 
 
 # Add a title
@@ -48,6 +98,7 @@ done = False
  
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
+
  
 # -------- Main Program Loop -----------
 while not done:
@@ -59,7 +110,7 @@ while not done:
             click_pos = pygame.mouse.get_pos()
           
             # use coordinates to check if a btn clicked
-            if inc_time_step_button.collidepoint(click_pos) and time_step < 20:
+            if inc_time_step_button.collidepoint(click_pos) and time_step < 50:
                 time_step += 1
             if dec_time_step_button.collidepoint(click_pos) and time_step > 1:
                 time_step -= 1
@@ -76,7 +127,12 @@ while not done:
     if running:
         if generations < SQ_NUM:
             generations += 1
-            automata = get_new_value(generations-1, automata)
+            if generations == 49:
+                generations = 0
+                automata = start()
+                
+            else:
+                automata = get_new_value(generations-1, automata)
             
         # --- Screen-clearing code goes here
     
