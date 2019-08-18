@@ -13,7 +13,7 @@ class RIGHT_EDGE(Exception):
 rewind = []
 keep_going = "no"
 def rewinder(index):
-    old_automata = rewind[index]
+    old_automata = rewind[index][::-1]
     return old_automata
     
 
@@ -33,7 +33,6 @@ def get_new_value(old_gen, old_automata):
 
                 if prev_status[i] == 1:
                     on+=1
-                print(f'i {i} at j {j}')
             
             except LEFT_EDGE as l:
                 i +=1
@@ -48,7 +47,8 @@ def get_new_value(old_gen, old_automata):
         
         on = 0
 
-
+    if old_gen == 47:
+        rewind.append(old_automata[:])
 
     return old_automata    
 
@@ -56,7 +56,6 @@ def get_new_value(old_gen, old_automata):
     # TBC - add code to generate the next row of cells,
     # then replace the return statement below to
     # return the updated automata
-    print(prev_status)
     return old_automata
 
 # Define some colors and other constants
@@ -138,20 +137,20 @@ while not done:
                 generations += 1
                 if generations == 49:
                     keep_going = 'yes'
-                    generations = 47
+                    generations = 0
                     automata = rewinder(generations)
                     
                 else:
                     automata = get_new_value(generations-1, automata)
             else:
-                if generations > 0:
-                    generations -= 1
+                if generations < 48:
+                    generations += 1
                     automata = rewinder(generations)
                 else:
                     keep_going = "no"
-                    generations += 1
+                    generations = 0
                     rewind = []
-                    automata = get_new_value(generations-1, automata)
+                    automata = start()
 
             
         # --- Screen-clearing code goes here
