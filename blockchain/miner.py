@@ -22,13 +22,13 @@ def proof_of_work(last_proof):
     start = timer()
 
     print("Searching for next proof")
-    proof = 4444
+    proof = 4
     #  TODO: Your code here
 
     while not valid_proof(last_proof, proof):
         proof+=4
 
-    print("Proof found: " + str(proof) + " in " + str(timer() - start))
+    print("Proof found: " + str(proof) + " in " + str(timer() - start), f'total time: {round(timer()/60, 2)} minutes or {round(timer()/3600, 2)} hours')
     return proof
 
 
